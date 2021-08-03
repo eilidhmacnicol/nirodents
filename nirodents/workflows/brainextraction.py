@@ -145,6 +145,12 @@ def init_rodent_brain_extraction_wf(
     # main workflow
     wf = pe.Workflow(name)
 
+    # equalize_histograms
+    equalize_tmpl = pe.Node(niu.Function(function=_equalize_histogram), name="equalize_tmpl")
+    equalize_tmpl.inputs.in_file = _pop(tpl_target_path)
+
+    equalize_target = pe.Node(niu.Function(function=_equalize_histogram), name="equalize_target")
+
     # truncate target intensity for N4 correction
     clip_target = pe.Node(IntensityClip(p_min=15, p_max=99.9), name="clip_target")
 
@@ -183,7 +189,8 @@ def init_rodent_brain_extraction_wf(
     # fmt: off
     wf.connect([
         # Target image massaging
-        (inputnode, clip_target, [(("in_files", _pop), "in_file")]),
+        (inputnode, equalize_target, [(("in_files", _pop), "in_file")]),
+        (equalize_target, clip_target, [("out", "in_file")]),
         (inputnode, bspline_grid, [(("in_files", _pop), "in_file")]),
         (bspline_grid, init_n4, [("out", "args")]),
         (clip_target, denoise, [("out_file", "input_image")]),
@@ -197,6 +204,7 @@ def init_rodent_brain_extraction_wf(
         (buffernode, mrg_target, [("hires_target", "in1")]),
         (norm_lap_target, mrg_target, [("out", "in2")]),
         # Template massaging
+        (equalize_tmpl, clip_tmpl, [("out", "in_file")]),
         (clip_tmpl, res_tmpl, [("out_file", "in_file")]),
         (res_tmpl, tmpl_sigma, [("out_file", "in_file")]),
         (res_tmpl, lap_tmpl, [("out_file", "op1")]),
@@ -481,4 +489,32 @@ def _norm_lap(in_file):
     hdr = img.header.copy()
     hdr.set_data_dtype("float32")
     img.__class__(data.astype("float32"), img.affine, hdr).to_filename(out_file)
+    return out_file
+
+
+def _equalize_histogram(in_file):
+    from pathlib import Path
+    import nibabel as nb
+    # from scipy.ndimage import median_filter
+    # from skimage.morphology import ball
+    from skimage.exposure import equalize_hist
+    from nipype.utils.filemanip import fname_presuffix
+
+    # Load data
+    img = nb.load(in_file)
+    data = img.get_fdata()
+
+    # Calculate stats on denoised version, to preempt outliers from biasing
+    # denoised = median_filter(data, footprint=ball(3))
+
+    # equalized = equalize_hist(denoised)
+    equalized = equalize_hist(data)
+
+    out_file = fname_presuffix(
+        Path(in_file).name,
+        suffix="_eq",
+        newpath=str(Path.cwd().absolute())
+    )
+
+    img.__class__(equalized, img.affine, img.header).to_filename(out_file)
     return out_file
