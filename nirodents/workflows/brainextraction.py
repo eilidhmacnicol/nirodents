@@ -159,7 +159,8 @@ def init_rodent_brain_extraction_wf(
     clip_tmpl.inputs.in_file = _pop(tpl_target_path)
 
     # set INU bspline grid based on voxel size
-    bspline_grid = pe.Node(niu.Function(function=_bspline_grid), name="bspline_grid")
+    bspline_grid = pe.Node(niu.Function(function=_bspline_grid),
+                           name="bspline_grid", run_without_submitting=True)
 
     # INU correction of the target image
     init_n4 = pe.Node(
