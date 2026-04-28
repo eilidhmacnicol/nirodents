@@ -73,7 +73,7 @@ version-file = "nirodents/_version.py"
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
-platforms = ["linux-64"]
+platforms = ["linux-64", "osx-arm64"]
 
 [tool.pixi.environments]
 # Local installs will use editable
@@ -86,22 +86,17 @@ nirodents = { path = ".", editable = true }
 [tool.pixi.feature.production.pypi-dependencies]
 nirodents = { path = ".", editable = false }
 
-[tool.pixi.tasks]
-
-[tool.pixi.pypi-options.dependency-overrides]
-numpy = ">=2.2"
-
 [tool.pixi.dependencies]
 python = "3.12.*"
-nodejs = "20.*"
-mkl = "2024.2.2.*"
-mkl-service = "2.4.2.*"
 numpy = "2.2.*"
 scipy = "1.15.*"
 matplotlib = "3.10.*"
 h5py = "3.13.*"
+
+[tool.pixi.target.linux-64.dependencies]
 ants = "2.6.*"
-pandoc = "3.7.*"
+mkl = "2024.2.2.*"
+mkl-service = "2.4.2.*"
 
 #
 # Developer tool configurations
