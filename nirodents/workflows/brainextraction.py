@@ -1,9 +1,6 @@
 # emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 """Nipype translation of ANTs' workflows."""
-# general purpose
-from pkg_resources import resource_filename as pkgr_fn
-
 # nipype
 from nipype.pipeline import engine as pe
 from nipype.interfaces import utility as niu
@@ -26,6 +23,7 @@ from niworkflows.interfaces.reportlets.registration import (
 )
 
 from templateflow.api import get as get_template
+from nirodents.data import load as load_data
 from nirodents.interfaces import DenoiseImage
 
 from nirodents import __version__
@@ -132,9 +130,7 @@ def init_rodent_brain_extraction_wf(
     ants_params = "testing" if debug else "precise"
     norm = pe.Node(
         Registration(
-            from_file=pkgr_fn(
-                "nirodents", f"data/artsBrainExtraction_{ants_params}_{mri_scheme}.json"
-            )
+            from_file=load_data(f"data/artsBrainExtraction_{ants_params}_{mri_scheme}.json")
         ),
         name="norm",
         n_procs=omp_nthreads,
