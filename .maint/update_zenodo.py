@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Update and sort the creators list of the zenodo record."""
+
 import json
 import sys
 from pathlib import Path
@@ -16,20 +17,14 @@ def sort_contributors(entries, git_lines, exclude=None, last=None):
     last = last or []
     sorted_authors = sorted(entries, key=lambda i: i['name'])
 
-    first_last = [
-        ' '.join(val['name'].split(',')[::-1]).strip() for val in sorted_authors
-    ]
-    first_last_excl = [
-        ' '.join(val['name'].split(',')[::-1]).strip() for val in exclude or []
-    ]
+    first_last = [' '.join(val['name'].split(',')[::-1]).strip() for val in sorted_authors]
+    first_last_excl = [' '.join(val['name'].split(',')[::-1]).strip() for val in exclude or []]
 
     unmatched = []
     author_matches = []
     position = 1
     for ele in git_lines:
-        matches = process.extract(
-            ele, first_last, scorer=fuzz.token_sort_ratio, limit=2
-        )
+        matches = process.extract(ele, first_last, scorer=fuzz.token_sort_ratio, limit=2)
         # matches is a list [('First match', % Match), ('Second match', % Match)]
         if matches[0][1] > 80:
             val = sorted_authors[first_last.index(matches[0][0])]
@@ -84,7 +79,7 @@ def get_git_lines(fname='line-contributors.txt'):
     if not lines:
         raise RuntimeError(
             'Could not find line-contributors from git repository.'
-            f'{'git-line-summary not found, please install git-extras.' * (git_line_summary_path is None)}'
+            f'{"git-line-summary not found, please install git-extras." * (git_line_summary_path is None)}'
         )
     return [' '.join(line.strip().split()[1:-1]) for line in lines if '%' in line]
 
@@ -114,7 +109,7 @@ if __name__ == '__main__':
 
     print(
         'Some people made commits, but are missing in .maint/ '
-        f'files: {', '.join(set(miss_creators).intersection(miss_contributors))}.',
+        f'files: {", ".join(set(miss_creators).intersection(miss_contributors))}.',
         file=sys.stderr,
     )
 

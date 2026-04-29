@@ -28,9 +28,7 @@ def get_parser():
         required=True,
         help='The mask image for overlay.',
     )
-    parser.add_argument(
-        '-o', '--output', type=Path, help='The location of output file.'
-    )
+    parser.add_argument('-o', '--output', type=Path, help='The location of output file.')
     parser.add_argument(
         '-s',
         '--plot-sagittal',

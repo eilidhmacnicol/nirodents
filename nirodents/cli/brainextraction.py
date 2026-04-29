@@ -1,4 +1,5 @@
 """Command Line Interface."""
+
 from pathlib import Path
 
 

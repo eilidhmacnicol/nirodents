@@ -69,11 +69,7 @@ def plot_slice(
             horizontalalignment='center',
             verticalalignment='top',
             size=18,
-            bbox={
-                'boxstyle': 'square,pad=0',
-                'ec': bgcolor,
-                'fc': bgcolor
-            },
+            bbox={'boxstyle': 'square,pad=0', 'ec': bgcolor, 'fc': bgcolor},
         )
         ax.text(
             0.05,
@@ -84,11 +80,7 @@ def plot_slice(
             horizontalalignment='center',
             verticalalignment='top',
             size=18,
-            bbox={
-                'boxstyle': 'square,pad=0',
-                'ec': bgcolor,
-                'fc': bgcolor
-            },
+            bbox={'boxstyle': 'square,pad=0', 'ec': bgcolor, 'fc': bgcolor},
         )
 
     if label is not None:
@@ -101,11 +93,7 @@ def plot_slice(
             horizontalalignment='right',
             verticalalignment='bottom',
             size=18,
-            bbox={
-                'boxstyle': 'square,pad=0',
-                'ec': bgcolor,
-                'fc': bgcolor
-            },
+            bbox={'boxstyle': 'square,pad=0', 'ec': bgcolor, 'fc': bgcolor},
         )
 
     return ax
@@ -245,9 +233,7 @@ def plot_mosaic(
             )
             naxis += 1
 
-    fig.subplots_adjust(
-        left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.05, hspace=0.05
-    )
+    fig.subplots_adjust(left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.05, hspace=0.05)
 
     if title:
         fig.suptitle(title, fontsize='10')

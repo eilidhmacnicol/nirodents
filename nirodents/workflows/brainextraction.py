@@ -1,6 +1,7 @@
 # emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 """Nipype translation of ANTs' workflows."""
+
 # nipype
 from nipype.interfaces import utility as niu
 from nipype.interfaces.ants import (
@@ -66,9 +67,7 @@ def init_rodent_brain_extraction_wf(
         Set-up a pre-initialization step with ``antsAI`` to account for mis-oriented images.
 
     """
-    inputnode = pe.Node(
-        niu.IdentityInterface(fields=['in_files', 'in_mask']), name='inputnode'
-    )
+    inputnode = pe.Node(niu.IdentityInterface(fields=['in_files', 'in_mask']), name='inputnode')
     outputnode = pe.Node(
         niu.IdentityInterface(fields=['out_corrected', 'out_brain', 'out_mask']),
         name='outputnode',
@@ -79,11 +78,15 @@ def init_rodent_brain_extraction_wf(
         template_specs['resolution'] = 2
 
     # Find a suitable target template in TemplateFlow
-    tpl_target_path = get_template(template_id, suffix=mri_scheme, **template_specs,)
+    tpl_target_path = get_template(
+        template_id,
+        suffix=mri_scheme,
+        **template_specs,
+    )
     if not tpl_target_path:
         raise RuntimeError(
             f"An instance of template <tpl-{template_id}> with MR scheme '{mri_scheme}'"
-            " could not be found."
+            ' could not be found.'
         )
 
     tpl_brainmask_path = get_template(
@@ -110,21 +113,24 @@ def init_rodent_brain_extraction_wf(
         **template_specs,
     )
 
-    denoise = pe.Node(DenoiseImage(dimension=3, copy_header=True),
-                      name='denoise', n_procs=omp_nthreads)
+    denoise = pe.Node(
+        DenoiseImage(dimension=3, copy_header=True), name='denoise', n_procs=omp_nthreads
+    )
 
     # Resample template to a controlled, isotropic resolution
     res_tmpl = pe.Node(RegridToZooms(zooms=HIRES_ZOOMS, smooth=True), name='res_tmpl')
 
     # Create Laplacian images
     lap_tmpl = pe.Node(ImageMath(operation='Laplacian', copy_header=True), name='lap_tmpl')
-    tmpl_sigma = pe.Node(niu.Function(function=_lap_sigma),
-                         name='tmpl_sigma', run_without_submitting=True)
+    tmpl_sigma = pe.Node(
+        niu.Function(function=_lap_sigma), name='tmpl_sigma', run_without_submitting=True
+    )
     norm_lap_tmpl = pe.Node(niu.Function(function=_norm_lap), name='norm_lap_tmpl')
 
     lap_target = pe.Node(ImageMath(operation='Laplacian', copy_header=True), name='lap_target')
-    target_sigma = pe.Node(niu.Function(function=_lap_sigma),
-                           name='target_sigma', run_without_submitting=True)
+    target_sigma = pe.Node(
+        niu.Function(function=_lap_sigma), name='target_sigma', run_without_submitting=True
+    )
     norm_lap_target = pe.Node(niu.Function(function=_norm_lap), name='norm_lap_target')
 
     # Set up initial spatial normalization
@@ -169,9 +175,7 @@ def init_rodent_brain_extraction_wf(
     clip_inu = pe.Node(IntensityClip(p_min=1, p_max=99.8), name='clip_inu')
 
     # Create a buffer interface as a cache for the actual inputs to registration
-    buffernode = pe.Node(
-        niu.IdentityInterface(fields=['hires_target']), name='buffernode'
-    )
+    buffernode = pe.Node(niu.IdentityInterface(fields=['hires_target']), name='buffernode')
 
     # Merge image nodes
     mrg_target = pe.Node(niu.Merge(2), name='mrg_target')
@@ -294,12 +298,8 @@ def init_rodent_brain_extraction_wf(
 
     if ants_affine_init:
         # Initialize transforms with antsAI
-        lowres_tmpl = pe.Node(
-            RegridToZooms(zooms=LOWRES_ZOOMS, smooth=True), name='lowres_tmpl'
-        )
-        lowres_trgt = pe.Node(
-            RegridToZooms(zooms=LOWRES_ZOOMS, smooth=True), name='lowres_trgt'
-        )
+        lowres_tmpl = pe.Node(RegridToZooms(zooms=LOWRES_ZOOMS, smooth=True), name='lowres_tmpl')
+        lowres_trgt = pe.Node(RegridToZooms(zooms=LOWRES_ZOOMS, smooth=True), name='lowres_trgt')
 
         init_aff = pe.Node(
             AI(
@@ -380,13 +380,22 @@ def init_rodent_brain_extraction_wf(
     if output_dir:
         ds_final_inu = pe.Node(
             DerivativesDataSink(
-                base_directory=str(output_dir), desc='preproc', compress=True,
-            ), name='ds_final_inu', run_without_submitting=True
+                base_directory=str(output_dir),
+                desc='preproc',
+                compress=True,
+            ),
+            name='ds_final_inu',
+            run_without_submitting=True,
         )
         ds_final_msk = pe.Node(
             DerivativesDataSink(
-                base_directory=str(output_dir), desc='brain', suffix='mask', compress=True,
-            ), name='ds_final_msk', run_without_submitting=True
+                base_directory=str(output_dir),
+                desc='brain',
+                suffix='mask',
+                compress=True,
+            ),
+            name='ds_final_msk',
+            run_without_submitting=True,
         )
 
         # fmt: off
@@ -401,9 +410,10 @@ def init_rodent_brain_extraction_wf(
         if interim_checkpoints:
             ds_report = pe.Node(
                 DerivativesDataSink(
-                    base_directory=str(output_dir), desc='brain',
-                    suffix='mask', datatype='figures'
-                ), name='ds_report', run_without_submitting=True
+                    base_directory=str(output_dir), desc='brain', suffix='mask', datatype='figures'
+                ),
+                name='ds_report',
+                run_without_submitting=True,
             )
             # fmt: off
             wf.connect([
@@ -415,9 +425,10 @@ def init_rodent_brain_extraction_wf(
         if ants_affine_init and interim_checkpoints:
             ds_report_init = pe.Node(
                 DerivativesDataSink(
-                    base_directory=str(output_dir), desc='init',
-                    suffix='mask', datatype='figures'
-                ), name='ds_report_init', run_without_submitting=True
+                    base_directory=str(output_dir), desc='init', suffix='mask', datatype='figures'
+                ),
+                name='ds_report_init',
+                run_without_submitting=True,
             )
             # fmt: off
             wf.connect([
@@ -446,7 +457,7 @@ def _bspline_grid(in_file):
     extent = (np.array(img.shape[:3]) - 1) * zooms
     # get mesh resolution ratio
     retval = [f'{math.ceil(i / extent[np.argmin(extent)])}' for i in extent]
-    return f"-b [{'x'.join(retval)}]"
+    return f'-b [{"x".join(retval)}]'
 
 
 def _lap_sigma(in_file):
@@ -455,7 +466,7 @@ def _lap_sigma(in_file):
 
     img = nb.load(in_file)
     min_vox = np.amin(img.header.get_zooms())
-    return str(1.5 * min_vox ** 0.75)
+    return str(1.5 * min_vox**0.75)
 
 
 def _norm_lap(in_file):
