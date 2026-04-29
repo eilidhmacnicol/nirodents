@@ -15,7 +15,7 @@ RUN pixi shell-hook -e nirodents --as-is | grep -v PATH > /shell-hook.sh
 # RUN --mount=type=cache,target=/root/.cache/rattler pixi install -e nirodents --frozen --skip nirodents
 
 
-FROM ubuntu:jammy-20250404
+FROM ubuntu:resolute-20260413
 
 # Create a shared $HOME directory
 RUN useradd -m -s /bin/bash -G users nirodents
