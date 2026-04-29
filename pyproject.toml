@@ -42,6 +42,7 @@ dev = [
     "pre-commit",
 ]
 duecredit = ["duecredit"]
+types = []
 
 [project.scripts]
 artsBrainExtraction="nirodents.cli.brainextraction:main"
@@ -174,3 +175,11 @@ source = [
   "nirodents",
   "**/site-packages/nirodents"
 ]
+
+[[tool.mypy.overrides]]
+module = [
+  'niworkflows.*',
+  'nipype.*',
+  'templateflow.*'
+]
+ignore_missing_imports = true
