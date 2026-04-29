@@ -36,6 +36,7 @@ Homepage = "https://github.com/nipreps/nirodents"
 NiPreps = "https://www.nipreps.org/"
 
 [project.optional-dependencies]
+tests = []
 dev = [
     "ruff",
     "pre-commit",
