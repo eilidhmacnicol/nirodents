@@ -4,10 +4,10 @@
 
 import math
 import os.path as op
-import numpy as np
-import nibabel as nb
 
 import matplotlib.pyplot as plt
+import nibabel as nb
+import numpy as np
 
 DEFAULT_DPI = 300
 DINA4_LANDSCAPE = (11.69, 8.27)
@@ -17,7 +17,7 @@ DINA4_PORTRAIT = (8.27, 11.69)
 def plot_slice(
     dslice,
     spacing=None,
-    cmap="Greys_r",
+    cmap='Greys_r',
     label=None,
     ax=None,
     vmax=None,
@@ -26,7 +26,7 @@ def plot_slice(
 ):
     from matplotlib.cm import get_cmap
 
-    if isinstance(cmap, (str, bytes)):
+    if isinstance(cmap | (str, bytes)):
         cmap = get_cmap(cmap)
 
     est_vmin, est_vmax = _get_limits(dslice)
@@ -47,14 +47,14 @@ def plot_slice(
         vmin=vmin,
         vmax=vmax,
         cmap=cmap,
-        interpolation="nearest",
-        origin="lower",
+        interpolation='nearest',
+        origin='lower',
         extent=[0, phys_sp[0], 0, phys_sp[1]],
     )
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.grid(False)
-    ax.axis("off")
+    ax.axis('off')
 
     bgcolor = cmap(min(vmin, 0.0))
     fgcolor = cmap(vmax)
@@ -63,24 +63,32 @@ def plot_slice(
         ax.text(
             0.95,
             0.95,
-            "R",
+            'R',
             color=fgcolor,
             transform=ax.transAxes,
-            horizontalalignment="center",
-            verticalalignment="top",
+            horizontalalignment='center',
+            verticalalignment='top',
             size=18,
-            bbox=dict(boxstyle="square,pad=0", ec=bgcolor, fc=bgcolor),
+            bbox={
+                'boxstyle': 'square,pad=0',
+                'ec': bgcolor,
+                'fc': bgcolor
+            },
         )
         ax.text(
             0.05,
             0.95,
-            "L",
+            'L',
             color=fgcolor,
             transform=ax.transAxes,
-            horizontalalignment="center",
-            verticalalignment="top",
+            horizontalalignment='center',
+            verticalalignment='top',
             size=18,
-            bbox=dict(boxstyle="square,pad=0", ec=bgcolor, fc=bgcolor),
+            bbox={
+                'boxstyle': 'square,pad=0',
+                'ec': bgcolor,
+                'fc': bgcolor
+            },
         )
 
     if label is not None:
@@ -90,10 +98,14 @@ def plot_slice(
             label,
             color=fgcolor,
             transform=ax.transAxes,
-            horizontalalignment="right",
-            verticalalignment="bottom",
+            horizontalalignment='right',
+            verticalalignment='bottom',
             size=18,
-            bbox=dict(boxstyle="square,pad=0", ec=bgcolor, fc=bgcolor),
+            bbox={
+                'boxstyle': 'square,pad=0',
+                'ec': bgcolor,
+                'fc': bgcolor
+            },
         )
 
     return ax
@@ -110,20 +122,20 @@ def plot_mosaic(
     annotate=True,
     vmin=None,
     vmax=None,
-    cmap="Greys_r",
+    cmap='Greys_r',
     plot_sagittal=True,
     fig=None,
     zmax=128,
 ):
 
-    if isinstance(img, (str, bytes)):
+    if isinstance(img | (str, bytes)):
         nii = nb.as_closest_canonical(nb.load(img))
         img_data = nii.get_data()
         zooms = nii.header.get_zooms()
     else:
         img_data = img
         zooms = [1.0, 1.0, 1.0]
-        out_file = "mosaic.svg"
+        out_file = 'mosaic.svg'
 
     # Remove extra dimensions
     img_data = np.squeeze(img_data)
@@ -138,7 +150,7 @@ def plot_mosaic(
         bbox_data = nb.as_closest_canonical(nb.load(bbox_mask_file)).get_data()
         img_data = _bbox(img_data, bbox_data)
 
-    z_vals = np.array(list(range(0, img_data.shape[2])))
+    z_vals = np.array(list(range(img_data.shape[2])))
 
     # Reduce the number of slices shown
     if len(z_vals) > zmax:
@@ -188,7 +200,7 @@ def plot_mosaic(
             cmap=cmap,
             ax=ax,
             spacing=zooms[:2],
-            label="%d" % z_val,
+            label=f'{z_val:d}',
             annotate=annotate,
         )
 
@@ -228,7 +240,7 @@ def plot_mosaic(
                 vmax=vmax,
                 cmap=cmap,
                 ax=ax,
-                label="%d" % x_val,
+                label=f'{x_val:d}',
                 spacing=[zooms[0], zooms[2]],
             )
             naxis += 1
@@ -238,16 +250,16 @@ def plot_mosaic(
     )
 
     if title:
-        fig.suptitle(title, fontsize="10")
+        fig.suptitle(title, fontsize='10')
     fig.subplots_adjust(wspace=0.002, hspace=0.002)
 
     if out_file is None:
         fname, ext = op.splitext(op.basename(img))
-        if ext == ".gz":
+        if ext == '.gz':
             fname, _ = op.splitext(fname)
-        out_file = op.abspath(fname + "_mosaic.svg")
+        out_file = op.abspath(fname + '_mosaic.svg')
 
-    fig.savefig(out_file, format="svg", dpi=300, bbox_inches="tight")
+    fig.savefig(out_file, format='svg', dpi=300, bbox_inches='tight')
     return out_file
 
 

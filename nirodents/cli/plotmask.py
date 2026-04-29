@@ -6,45 +6,45 @@ from pathlib import Path
 
 def get_parser():
     """Build parser object."""
-    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
     parser = ArgumentParser(
-        prog="plot_mask",
+        prog='plot_mask',
         description="""plot_mask -- Create mosaic plot of mask on a base.""",
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
     parser.add_argument(
-        "-b",
-        "--base-image",
+        '-b',
+        '--base-image',
         type=Path,
         required=True,
-        help="The base image for overlay.",
+        help='The base image for overlay.',
     )
     parser.add_argument(
-        "-m",
-        "--mask-image",
+        '-m',
+        '--mask-image',
         type=Path,
         required=True,
-        help="The mask image for overlay.",
+        help='The mask image for overlay.',
     )
     parser.add_argument(
-        "-o", "--output", type=Path, help="The location of output file."
+        '-o', '--output', type=Path, help='The location of output file.'
     )
     parser.add_argument(
-        "-s",
-        "--plot-sagittal",
+        '-s',
+        '--plot-sagittal',
         type=int,
         default=0,
         choices=[0, 1],
-        help="Boolean to also print sagittal plane.",
+        help='Boolean to also print sagittal plane.',
     )
     parser.add_argument(
-        "-c",
-        "--columns",
+        '-c',
+        '--columns',
         type=int,
         default=7,
-        help="Integer describing number of columns in plot.",
+        help='Integer describing number of columns in plot.',
     )
 
     return parser
@@ -58,10 +58,10 @@ def main():
     opts = get_parser().parse_args()
     if opts.output is None:
         mask_dir = os.path.dirname(opts.mask_image)
-        output_path = os.path.join(mask_dir, "mask_plot.svg")
+        output_path = os.path.join(mask_dir, 'mask_plot.svg')
     else:
-        if os.path.basename(opts.output)[-4:] != ".svg":
-            raise ValueError("Output must be .svg file")
+        if os.path.basename(opts.output)[-4:] != '.svg':
+            raise ValueError('Output must be .svg file')
         else:
             output_path = opts.output
 
@@ -75,7 +75,7 @@ def main():
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise RuntimeError(
         """\
 nirodents/cli/plotmask.py should not be run directly;
