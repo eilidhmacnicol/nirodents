@@ -137,7 +137,7 @@ def init_rodent_brain_extraction_wf(
     ants_params = 'testing' if debug else 'precise'
     norm = pe.Node(
         Registration(
-            from_file=load_data(f'data/artsBrainExtraction_{ants_params}_{mri_scheme}.json')
+            from_file=load_data(f'artsBrainExtraction_{ants_params}_{mri_scheme}.json')
         ),
         name='norm',
         n_procs=omp_nthreads,
