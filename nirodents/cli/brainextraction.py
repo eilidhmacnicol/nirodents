@@ -1,11 +1,13 @@
 """Command Line Interface."""
+
 from pathlib import Path
 
 
 def get_parser():
     """Build parser object."""
+    from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
     from os import cpu_count
-    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
     from nirodents import __version__
 
     parser = ArgumentParser(
@@ -17,110 +19,110 @@ ANTs-based Rodents ToolS (ARTs) package.\
     )
 
     parser.add_argument(
-        "input_image",
-        action="store",
+        'input_image',
+        action='store',
         type=Path,
-        help="The target image for brain extraction.",
+        help='The target image for brain extraction.',
     )
     parser.add_argument(
-        "--version",
-        action="version",
-        version="artsBrainExtraction v{}".format(__version__),
+        '--version',
+        action='version',
+        version=f'artsBrainExtraction v{__version__}',
     )
     parser.add_argument(
-        "--template",
-        action="store",
-        default="Fischer344",
-        help="The TemplateFlow ID of the reference template.",
+        '--template',
+        action='store',
+        default='Fischer344',
+        help='The TemplateFlow ID of the reference template.',
     )
     parser.add_argument(
-        "--omp-nthreads",
-        action="store",
+        '--omp-nthreads',
+        action='store',
         type=int,
         default=cpu_count(),
-        help="Number of CPUs available for multithreading processes.",
+        help='Number of CPUs available for multithreading processes.',
     )
     parser.add_argument(
-        "--nprocs",
-        action="store",
+        '--nprocs',
+        action='store',
         type=int,
         default=cpu_count(),
-        help="Number of processes that can be run in parallel.",
+        help='Number of processes that can be run in parallel.',
     )
     parser.add_argument(
-        "-m",
-        "--mri-scheme",
-        action="store",
+        '-m',
+        '--mri-scheme',
+        action='store',
         type=str,
-        default="T2w",
-        help="select a particular MRI scheme",
+        default='T2w',
+        help='select a particular MRI scheme',
     )
     parser.add_argument(
-        "-o",
-        "--output-dir",
-        action="store",
+        '-o',
+        '--output-dir',
+        action='store',
         type=Path,
-        default=Path("results").absolute(),
-        help="path where intermediate results should be stored",
+        default=Path('results').absolute(),
+        help='path where intermediate results should be stored',
     )
     parser.add_argument(
-        "-w",
-        "--work-dir",
-        action="store",
+        '-w',
+        '--work-dir',
+        action='store',
         type=Path,
-        default=Path("work").absolute(),
-        help="path where intermediate results should be stored",
+        default=Path('work').absolute(),
+        help='path where intermediate results should be stored',
     )
     parser.add_argument(
-        "--sloppy",
-        dest="debug",
-        action="store_true",
+        '--sloppy',
+        dest='debug',
+        action='store_true',
         default=False,
-        help="Use low-quality tools for speed - TESTING ONLY",
+        help='Use low-quality tools for speed - TESTING ONLY',
     )
     parser.add_argument(
-        "--antsAI",
-        dest="antsai_init",
-        action="store_true",
+        '--antsAI',
+        dest='antsai_init',
+        action='store_true',
         default=False,
-        help="Include antsAI initialization step",
+        help='Include antsAI initialization step',
     )
 
     parser.add_argument(
-        "--antsAI-factor",
-        dest="antsai_factor",
-        action="store",
+        '--antsAI-factor',
+        dest='antsai_factor',
+        action='store',
         type=int,
         default=20,
-        help="Specify ants-ai search factor parameter",
+        help='Specify ants-ai search factor parameter',
     )
 
     parser.add_argument(
-        "--antsAI-arcfrac",
-        dest="antsai_arcfrac",
+        '--antsAI-arcfrac',
+        dest='antsai_arcfrac',
         type=float,
-        action="store",
+        action='store',
         default=0.12,
-        help="Specify ants-ai arc fraction parameter",
+        help='Specify ants-ai arc fraction parameter',
     )
 
     parser.add_argument(
-        "--antsAI-step",
-        dest="antsai_step",
-        action="store",
+        '--antsAI-step',
+        dest='antsai_step',
+        action='store',
         type=float,
         default=4,
-        help="Specify ants-ai step size parameter",
+        help='Specify ants-ai step size parameter',
     )
 
     parser.add_argument(
-        "--antsAI-grid",
-        dest="antsai_grid",
-        action="store",
+        '--antsAI-grid',
+        dest='antsai_grid',
+        action='store',
         nargs=3,
         type=float,
         default=(0, 4, 4),
-        help="Specify ants-ai Search Grid parameter",
+        help='Specify ants-ai Search Grid parameter',
     )
     return parser
 
@@ -128,6 +130,7 @@ ANTs-based Rodents ToolS (ARTs) package.\
 def main():
     """Entry point."""
     from templateflow import update as update_templateflow
+
     from ..workflows.brainextraction import init_rodent_brain_extraction_wf
 
     opts = get_parser().parse_args()
@@ -147,18 +150,18 @@ def main():
     be.base_dir = opts.work_dir
     be.inputs.inputnode.in_files = Path(opts.input_image).absolute()
 
-    nipype_plugin = {"plugin": "Linear"}
+    nipype_plugin = {'plugin': 'Linear'}
     if opts.nprocs > 1:
-        nipype_plugin["plugin"] = "MultiProc"
-        nipype_plugin["plugin_args"] = {
-            "n_procs ": opts.nprocs,
-            "raise_insufficient": False,
-            "maxtasksperchild": 1,
+        nipype_plugin['plugin'] = 'MultiProc'
+        nipype_plugin['plugin_args'] = {
+            'n_procs ': opts.nprocs,
+            'raise_insufficient': False,
+            'maxtasksperchild': 1,
         }
     be.run(**nipype_plugin)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise RuntimeError(
         """\
 nirodents/cli/brainextraction.py should not be run directly;

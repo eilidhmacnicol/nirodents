@@ -21,14 +21,12 @@
 #     https://www.nipreps.org/community/licensing/
 #
 """Top-level package for nirodents."""
+
 from nirodents._version import __version__
 
-__packagename__ = "nirodents"
-__copyright__ = "Copyright 2023, The NiPreps Developers"
-__url__ = "https://github.com/nipreps/nirodents"
+__packagename__ = 'nirodents'
+__copyright__ = 'Copyright 2023, The NiPreps Developers'
+__url__ = 'https://github.com/nipreps/nirodents'
 
 
-DOWNLOAD_URL = (
-    f"https://github.com/nipreps/{__packagename__}/archive/{__version__}.tar.gz"
-)
-
+DOWNLOAD_URL = f'https://github.com/nipreps/{__packagename__}/archive/{__version__}.tar.gz'

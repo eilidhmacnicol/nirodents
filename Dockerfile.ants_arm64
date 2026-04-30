@@ -1,0 +1,40 @@
+FROM ubuntu:jammy-20260410
+
+ARG BUILD_DATE
+ARG VCS_REF=v2.6.5
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    cmake \
+    g++ \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build ANTs from source
+RUN cd /tmp && \
+git clone --branch v2.6.5 --depth 1 https://github.com/ANTsX/ANTs.git && \
+mkdir build && cd build && \
+cmake \
+    -DCMAKE_INSTALL_PREFIX=/opt/ants \
+    -DBUILD_TESTING=OFF \
+    -DRUN_LONG_TESTS=OFF \
+    -DRUN_SHORT_TESTS=OFF \
+    ../ANTs && \
+make -j 4 && \
+cd ANTS-build && \
+make install && \
+cd / && rm -rf /tmp/ANTs /tmp/build
+
+# Set ANTs environment variables
+ENV ANTSPATH=/opt/ants/bin/ \
+    PATH=/opt/ants/bin:$PATH
+
+# Final settings
+LABEL org.opencontainers.image.created=$BUILD_DATE \
+      org.opencontainers.image.title="ants-arm64" \
+      org.opencontainers.image.description="ANTs v2.6.5 built from source for linux/arm64" \
+      org.opencontainers.image.revision=$VCS_REF \
+      org.opencontainers.image.version="2.6.5" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.documentation="https://github.com/nipreps/nirodents"
