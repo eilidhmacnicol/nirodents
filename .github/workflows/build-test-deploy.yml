@@ -49,21 +49,12 @@ jobs:
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.12', '3.13', '3.14']
-        dependencies: [latest] # , pre]
-        architecture: ['x64']
+        dependencies: [latest]
         include:
           # Test minimum dependencies on oldest supported Python
           - os: ubuntu-latest
             python-version: "3.12"
             dependencies: min
-        exclude:
-          # Do not test pre-releases for versions out of SPEC0
-          - os: ubuntu-latest
-            python-version: "3.12"
-            dependencies: pre
-          - os: ubuntu-latest
-            python-version: "3.12"
-            dependencies: pre
     env:
       DEPENDS: ${{ matrix.dependencies }}
 
@@ -85,8 +76,10 @@ jobs:
           uv tool install tox --with=tox-uv --with=tox-gh-actions
       - name: Show tox config
         run: tox c
-      - name: Run tox
-        run: tox -v --exit-and-dump-after 1200
+      - name: Setup test suite
+        run: tox run -vv --notest
+      - name: Run test suite
+        run: tox -v --skip-pkg-install --exit-and-dump-after 1200
       - uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -126,7 +119,7 @@ jobs:
         run: uv tool install tox --with=tox-uv
       - name: Show tox config
         run: tox c
-      - name: Show tox config (this call)
-        run: tox c -e ${{ matrix.check }}
-      - name: Run check
-        run: tox -e ${{ matrix.check }}
+      - name: Setup test suite
+        run: tox run -vv --notest
+      - name: Run test suite
+        run: tox -v --skip-pkg-install --exit-and-dump-after 1200
